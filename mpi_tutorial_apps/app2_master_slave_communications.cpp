@@ -61,7 +61,7 @@ void slave(){
                 {
                     // + 1 so, we avoid number zero
                     rand_num= (rand() % 10 + 1);
-                    std::cout << "Slave (" << rank << "): random num: "<< rand_num << std::endl;
+                    //std::cout << "Slave (" << rank << "): random num: "<< rand_num << std::endl;
                     sum += rand_num;
                 }
                 //calculate the average 
