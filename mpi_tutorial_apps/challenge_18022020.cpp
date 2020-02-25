@@ -2,53 +2,55 @@
 #include<mpi.h>
 
 
-int main(int argc, char **argv){
+void  printArray(int *theArray, int size){
+    for (int i = 0; i < size; i++)
+    {
+        int current = theArray[i];
+        std::cout << "Value at position: " << i << " -> " << current << std::endl;
+    }
+    
 
+}
+
+int main(int argc, char **argv){
+    
     MPI_Init(&argc, &argv);
-    int world_size, rank;
+    int world_size, world_rank;
     
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
-    int req_num = 30;
-    int arrInt[req_num];
-    int randomNum;
-    
-    for (int i = 0; i < req_num; i++)
-    {
-        randomNum = rand() % 10;
-        arrInt[i] = randomNum;
-        i++;
-    }
-    
-    if(rank == 0){
-        int arrSend[req_num];
-        
-        MPI_Bcast(&arrSend,req_num,MPI_INT,0,MPI_COMM_WORLD);
-        std::cout << "rank " << rank << " broadcasting array message" << std::endl;
 
-    }else if(rank == 2){
-        int arrRecv[req_num];
+    int arr_size = 30;
+    
+
+    if(world_rank == 0){
+        std::cout << "creating array of integers" << std::endl;
         
-        MPI_Bcast(&arrRecv,req_num,MPI_INT,0,MPI_COMM_WORLD);
-        std::cout << "rank " << rank << " printing array received" << std::endl;
-        for (int i = 0; i < req_num; i++)
-        {
-            std::cout << i << ": " << arrRecv[i] << std::endl;
+        int intsArray[arr_size];
+        for (int i = 0; i < arr_size; i++){  
+            // srand(world_rank);          
+            unsigned int value = rand() % arr_size;
+            intsArray[i] = value;            
+            i++;
         }
-        
-        
- 
-    }else{
-        std::cout << "rank " << rank << " array received" << std::endl;
-    }
-    
-            
+        MPI_Bcast(&intsArray,arr_size,MPI_INT,0,MPI_COMM_WORLD);
+        std::cout << "rank 0 broadcasting array" << std::endl;
 
-    
+
+
+    }else{
+        int intsArray[arr_size];
+        MPI_Bcast(&intsArray,arr_size,MPI_INT,0,MPI_COMM_WORLD);
+        std::cout << "rank: " << world_rank << " received array" << std::endl;
+
+        if(world_rank == 2){
+             std::cout << "rank: " << world_rank << " printing array" << std::endl;
+             printArray(intsArray,arr_size);
+        }
+    }
+  
 
     MPI_Finalize();
-
-
 
 }
