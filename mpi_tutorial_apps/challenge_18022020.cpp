@@ -2,13 +2,40 @@
 #include<mpi.h>
 
 
-void printArray(const int theArray[], int size){
-    for (int i = 0; i < size; i++)
-    {        
-        std::cout << "Value at position: " << i+1 << " -> " << theArray[i] << std::endl;
+void printArray(int *theArray, int size){
+    for (int i = 0; i < size; i++){      
+        int current =  theArray[i];  
+        std::cout << "Value at position: " << i + 1 << ": " << current << std::endl;
     }
-    
+}
 
+
+void coordinator(const int size){
+    std::cout << "Coordinator " << " creating array " << std::endl;
+    int *intsArray= new int[size];//init array
+        
+        for (unsigned int i = 0; i < size; i++)
+        {
+            intsArray[i] = rand() % 10;           
+
+        }
+
+        std::cout << "Broadcasting array " << std::endl;
+        MPI_Bcast(intsArray, size, MPI_INT, 0, MPI_COMM_WORLD);
+
+        delete intsArray;
+
+}
+
+void worker(int rank, const int size){
+    std::cout << "Rank "<< rank << " received array" << std::endl;
+    int *intsArray= new int[size];//init array
+    MPI_Bcast(intsArray, size, MPI_INT, 0, MPI_COMM_WORLD);
+    
+        if(rank == 2){
+            printArray(intsArray,size);
+        }
+    delete intsArray;
 }
 
 int main(int argc, char **argv){
@@ -21,37 +48,19 @@ int main(int argc, char **argv){
 
 
     int arr_size = 30;
-    //int intsArray[arr_size];
-        int intsArray[arr_size]={0};
-        //int *intsArray = new int[arr_size];
-        for (int i = 0; i < arr_size; i++){  
-            // srand(world_rank);          
-            unsigned int value = rand() % 10;
-            intsArray[i] = value;            
-            i++;
-        }
+    srand(world_rank);
+
 
     if(world_rank == 0){
-        std::cout << "creating array of integers" << std::endl;
-        MPI_Bcast(&intsArray,arr_size,MPI_INT,0,MPI_COMM_WORLD);
-        std::cout << "rank 0 broadcasting array" << std::endl;
-
+        coordinator(arr_size);
 
     }else{
         // set array and initialize it
-        int intsArray[arr_size] = {0};
-
-        MPI_Bcast(&intsArray,arr_size,MPI_INT,0,MPI_COMM_WORLD);
-        std::cout << "rank: " << world_rank << " received array" << std::endl;
-
-        if(world_rank == 2){
-            std::cout << "rank: " << world_rank << " printing array" << std::endl;
-            printArray(intsArray,arr_size);
-            
-        }
+        worker(world_rank, arr_size);
+        
     }
   
     //deallocate memory
     MPI_Finalize();
-
+    return 0;
 }
