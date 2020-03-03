@@ -2,11 +2,10 @@
 #include<mpi.h>
 
 
-void  printArray(int *theArray, int size){
+void printArray(const int theArray[], int size){
     for (int i = 0; i < size; i++)
-    {
-        int current = theArray[i];
-        std::cout << "Value at position: " << i << " -> " << current << std::endl;
+    {        
+        std::cout << "Value at position: " << i+1 << " -> " << theArray[i] << std::endl;
     }
     
 
@@ -22,35 +21,37 @@ int main(int argc, char **argv){
 
 
     int arr_size = 30;
-    
-
-    if(world_rank == 0){
-        std::cout << "creating array of integers" << std::endl;
-        
-        int intsArray[arr_size];
+    //int intsArray[arr_size];
+        int intsArray[arr_size]={0};
+        //int *intsArray = new int[arr_size];
         for (int i = 0; i < arr_size; i++){  
             // srand(world_rank);          
-            unsigned int value = rand() % arr_size;
+            unsigned int value = rand() % 10;
             intsArray[i] = value;            
             i++;
         }
+
+    if(world_rank == 0){
+        std::cout << "creating array of integers" << std::endl;
         MPI_Bcast(&intsArray,arr_size,MPI_INT,0,MPI_COMM_WORLD);
         std::cout << "rank 0 broadcasting array" << std::endl;
 
 
-
     }else{
-        int intsArray[arr_size];
+        // set array and initialize it
+        int intsArray[arr_size] = {0};
+
         MPI_Bcast(&intsArray,arr_size,MPI_INT,0,MPI_COMM_WORLD);
         std::cout << "rank: " << world_rank << " received array" << std::endl;
 
         if(world_rank == 2){
-             std::cout << "rank: " << world_rank << " printing array" << std::endl;
-             printArray(intsArray,arr_size);
+            std::cout << "rank: " << world_rank << " printing array" << std::endl;
+            printArray(intsArray,arr_size);
+            
         }
     }
   
-
+    //deallocate memory
     MPI_Finalize();
 
 }
