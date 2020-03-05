@@ -22,7 +22,8 @@ void coordinator(const int size){
 
         std::cout << "Broadcasting array " << std::endl;
         MPI_Bcast(intsArray, size, MPI_INT, 0, MPI_COMM_WORLD);
-
+        
+        //deallocate memory
         delete intsArray;
 
 }
@@ -35,7 +36,9 @@ void worker(int rank, const int size){
         if(rank == 2){
             printArray(intsArray,size);
         }
-    delete intsArray;
+        
+        //deallocate memory
+        delete intsArray;
 }
 
 int main(int argc, char **argv){
@@ -48,7 +51,7 @@ int main(int argc, char **argv){
 
 
     int arr_size = 30;
-    srand(world_rank);
+    srand(arr_size);
 
 
     if(world_rank == 0){
@@ -60,7 +63,7 @@ int main(int argc, char **argv){
         
     }
   
-    //deallocate memory
+
     MPI_Finalize();
     return 0;
 }
