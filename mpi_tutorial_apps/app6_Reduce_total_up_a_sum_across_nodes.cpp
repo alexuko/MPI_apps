@@ -8,7 +8,7 @@ int main(int argc, char** argv){
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
 
 
-    std::cout << "rank: " << world_rank << " world size: " << world_size << std::endl;
+    //std::cout << "rank: " << world_rank << " world size: " << world_size << std::endl;
     int our_sum = 10;
     int total_sum = 0;
     MPI_Reduce(&our_sum, &total_sum, 1, MPI_INT,MPI_SUM, 0, MPI_COMM_WORLD);
