@@ -30,3 +30,8 @@ int main(int argc, char** argv){
 
 
 }
+/*
+mpic++ app5_MPI_broadcasting_mechanism.cpp -o app5_MPI_broadcasting_mechanism
+mpiexec -n 4 app5_MPI_broadcasting_mechanism
+
+*/
