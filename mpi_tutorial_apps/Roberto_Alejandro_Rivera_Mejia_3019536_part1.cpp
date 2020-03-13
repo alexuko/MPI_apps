@@ -64,8 +64,7 @@ int main(int argc, char **argv)
     }else{
         participant();
     }
-    
-    
+     
 
     // we are done with the MPI library so we must finalise it
     MPI_Finalize();
