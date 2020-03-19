@@ -2,7 +2,7 @@
 #include <mpi.h>
 #include <math.h>
 
-//size of the world, rank and root.
+//variables to determine size of the world, rank and root.
 int world_size, world_rank, size, root = 0;
 //variables for the time
 double start, end;
