@@ -135,7 +135,8 @@ double get_standar_deviation(double diff_sum, int size)
 //the entire dataset, and then deallocates memory. 
 void coordinator(int array_size)
 {
-    //check that the size is equaly divisible by the world_size otherwise size = world_size * 10
+    //check that the size is equaly divisible by the world_size otherwise 
+    //we will give back a default size = world_size * 10
     int arr_size = (array_size % world_size) == 0 ? array_size : world_size * 10;
 
     //print the name and student number
@@ -144,7 +145,6 @@ void coordinator(int array_size)
     std::cout << "Student number: 3019536" << std::endl;
     std::cout << "---------------------------------------" << std::endl;
     std::cout << "============    Coordinator, Rank " << world_rank << "    ============" << std::endl;
-    std::cout << "World size is: " << world_size << std::endl;
 
     //inittialize the array with the desired size
     int *arr_values = new int[arr_size];
@@ -165,7 +165,6 @@ void coordinator(int array_size)
 
     //coordinator broadcast the partition size to the rest of nodes
     MPI_Bcast(&partition_size, 1, MPI_INT, root, MPI_COMM_WORLD);
-    std::cout << "Partition size per node: " << partition_size << std::endl;
 
     //inittialialize the partition with its correct size
     int *partition = new int[partition_size];
@@ -195,6 +194,9 @@ void coordinator(int array_size)
 
     //Calculate the standard deviation and print out the dataset, mean and standard deviation (coordinator only).
     printArray(arr_values, arr_size);
+    std::cout << "World size is: " << world_size << std::endl;
+    std::cout << "Array size : " << arr_size << std::endl;
+    std::cout << "Partition size per node: " << partition_size << std::endl;
     std::cout << "Mean: " << overall_average << std::endl;
     double standar_deviation = get_standar_deviation(overall_sum_dif, arr_size);
 
@@ -251,6 +253,7 @@ run with 4 nodes
 mpiexec -n 4 Roberto_Alejandro_Rivera_Mejia_3019536_part2 1000
 run with 8 nodes
 mpiexec -n 8 --oversubscribe Roberto_Alejandro_Rivera_Mejia_3019536_part2 1000
+
 */
 
 
