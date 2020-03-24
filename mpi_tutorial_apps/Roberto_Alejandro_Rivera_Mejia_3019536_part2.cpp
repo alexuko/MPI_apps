@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     size  = world_size;
     //size of the array through command line
     //if more than 1 then a size has been assigned
-    if (world_rank == 0 && argc > 1)
+    if (world_rank == root && argc > 1)
     {
         size = atoi(argv[1]);
     }
@@ -134,10 +134,24 @@ double get_standar_deviation(double diff_sum, int size)
 //Finally the coordinator will calculate the standard deviation and print out results including
 //the entire dataset, and then deallocates memory. 
 void coordinator(int array_size)
-{
+{   
     //check that the size is equaly divisible by the world_size otherwise 
-    //we will give back a default size = world_size * 10
-    int arr_size = (array_size % world_size) == 0 ? array_size : world_size * 10;
+    //we will give back a default size = world_size * 10 ( SOLUTION 1 )
+    // int arr_size = (array_size % world_size) == 0 ? array_size : world_size * 10;    
+    
+    int arr_size = array_size;
+    //error message ( SOLUTION 2 )
+    if(arr_size % world_size != 0){
+        //display an error message in BOLD letters
+        std::cout << std::endl;
+        std::cout << "\e[1m*** Error *** Array size of: " << arr_size << " is not evenly divisible by " << world_size << "\e[0m" << std::endl;
+        std::cout << std::endl;
+        //assign ZERO to the arr_size
+        arr_size = 0;
+        // Kill al processes and abort ( SOLUTION 3 )
+        //MPI_Abort(MPI_COMM_WORLD, MPI_ERR_SIZE);
+        
+    }
 
     //print the name and student number
     std::cout << "---------------------------------------" << std::endl;
@@ -155,9 +169,9 @@ void coordinator(int array_size)
     {
         //assign a random value for each of the positions in the array
         //zero excluded
-        arr_values[i] = (rand() % 50) + 1;
+        //arr_values[i] = (rand() % 50) + 1;
         //zero included
-        //arr_values[i] = (rand() % 50);
+        arr_values[i] = (rand() % 51);
     }
     
     //divide the size of the array between the total number of nodes
@@ -223,7 +237,7 @@ void participant()
     int *partition = new int[partition_size];
 
     //Receive the scatter part that the root has sent
-    MPI_Scatter(partition,partition_size,MPI_INT,partition,partition_size,MPI_INT,root,MPI_COMM_WORLD);
+    MPI_Scatter(NULL,partition_size,MPI_INT,partition,partition_size,MPI_INT,root,MPI_COMM_WORLD);
     
     //Calculate the mean for this node.
     double mean = get_mean(partition, partition_size);
