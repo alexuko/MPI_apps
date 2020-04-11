@@ -24,6 +24,14 @@ int primeCounter(int n);
 */
 double performOperation();
 
+/**
+ * this method is the core method of the MPI program and 
+ * It will get the result of an operation perform in the method performOperation()
+ * then the result will be Gathered by the root which is going to hold the results from all
+ * of the ranks (nodes) in the world.  
+ * And finally print them out to the console by the root (only).
+ * 
+*/
 void run();
 
 //main() will be executed by each node
@@ -43,14 +51,6 @@ int main(int argc, char **argv)
     return 0;
 }
 
-/**
- * this method is the core method of the MPI program and 
- * It will get the result of an operation perform in the method performOperation()
- * then the result will be Gathered by the root which is going to hold the results from all
- * of the ranks (nodes) in the world.  
- * And finally print them out to the console by the root (only).
- * 
-*/
 void run()
 {
     if (world_rank == root)
