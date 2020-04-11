@@ -84,7 +84,7 @@ int newPrimeCounter(int *intArr, int arrSize)
             increment++;
         }
     }
-
+        
     // as the resultant new array may not be evenly divisible by the total of processes we will increase its size accordingly
     // until its evenly divisible, hence partitions will be equal
     offset = 0;
@@ -141,6 +141,7 @@ int newPrimeCounter(int *intArr, int arrSize)
         
     }
 
+    //print out the result from the current node in the screen 
     std::cout << " -> total: " << primesInNode << std::endl;
 
     //sum all of the primes from each node and pass it to the root which is gonna hold the sum value in the totalPrimesCount variable
@@ -148,10 +149,11 @@ int newPrimeCounter(int *intArr, int arrSize)
     
     //we wait for every node to reach this point 
     MPI_Barrier(MPI_COMM_WORLD);
-    //the root will print the total of prime numbers found from all the nodes within their partition
+    //then, the root will print the total of prime numbers found from all the nodes within their partition
     if(world_rank == root) 
         std::cout << "Rank: " << world_rank << " Primes total count: \e[1m" << totalPrimesCount << "\e[0m" <<std::endl;
-        
+    
+    //returns the total count of prime numbers     
     return totalPrimesCount;
 }
  
@@ -174,7 +176,7 @@ void printArray(int *printArray, int size)
 {   //must be an array and has to be bigger that zero
     if (printArray && size > 0)
     {
-
+        //loop through the results and print them on the console displaying to which rank they belong to 
         std::cout << "Rank \e[1m" << world_rank;
         std::cout << "\e[0m, array size \e[1m" << size << "\e[0m values: ";
         for (unsigned int i = 0; i < size; i++)
@@ -192,6 +194,7 @@ void printArray(int *printArray, int size)
 compile
 mpic++ Roberto_Alejandro_Rivera_Mejia_3019536_Ass2_part2.cpp -o Roberto_Alejandro_Rivera_Mejia_3019536_Ass2_part2
 run with 4 nodes
+mpiexec -n 1 Roberto_Alejandro_Rivera_Mejia_3019536_Ass2_part2
 mpiexec -n 4 Roberto_Alejandro_Rivera_Mejia_3019536_Ass2_part2
 mpiexec -n 8 --oversubscribe Roberto_Alejandro_Rivera_Mejia_3019536_Ass2_part2
 */
