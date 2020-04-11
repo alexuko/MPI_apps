@@ -34,7 +34,9 @@ double performOperation();
 */
 void run();
 
-//main() will be executed by each node
+/**
+ * main() will be executed by each node 
+*/
 int main(int argc, char **argv)
 {
     // initialise the MPI libary
