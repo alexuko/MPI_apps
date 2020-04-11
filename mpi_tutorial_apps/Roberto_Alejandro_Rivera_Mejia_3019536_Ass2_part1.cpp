@@ -3,21 +3,28 @@
 #include <math.h>
 //variables to determine size of the world, rank and root.
 int world_size, world_rank, root = 1;
-//results variables
-double *result, *totalResults;
+//result per node
+double result;
+//array that will hold results from each node in the world
+double *totalResults;
 
 //Declaring the methods we are going to need
-//method that returns the amount of prime numbers in a given integer n.
+/**
+ * Takes in and int = n, as a parameter and will return the total of 
+ * prime numbers encounter startin from 0 until n
+*/
 int primeCounter(int n);
 
-//method that returns the result of how long each node takes to run the primeCounter()
+/**
+ * Returns the result of how long each node takes to run the primeCounter() method
+ * It's going to initialize a timer when the operation starts and when it ends,
+ * perform the calculation for the current node
+ * once the operation has finished the calculate the diference between the starting time and the 
+ * end time and we return it as our final result 
+*/
 double performOperation();
 
-//method will perform the performOperation(), gather the result from the other nodes and print the results out.
-void coordinator();
-
-//method will perform the performOperation() and send its result to the coordinator.
-void participant();
+void run();
 
 //main() will be executed by each node
 int main(int argc, char **argv)
@@ -27,61 +34,65 @@ int main(int argc, char **argv)
     // determine the world size and the world rank
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-
-    //determine which node is the coordinator
-    if (world_rank == root)
-    {
-        coordinator();
-    }
-    else
-    {
-        participant();
-    }
+    
+    // execute the main operation for each node 
+    run();
+    
     // we are done with the MPI library so we must finalise it
     MPI_Finalize();
     return 0;
 }
 
-void coordinator()
+/**
+ * this method is the core method of the MPI program and 
+ * It will get the result of an operation perform in the method performOperation()
+ * then the result will be Gathered by the root which is going to hold the results from all
+ * of the ranks (nodes) in the world.  
+ * And finally print them out to the console by the root (only).
+ * 
+*/
+void run()
 {
-    //print the name and student number and processor model
-    std::cout << "Name: Roberto Alejandro Rivera Mejia" << std::endl;
-    std::cout << "No: 3019536" << std::endl;
-    std::cout << "uP: Intel(R) Core(TM) i5-3230M CPU @ 2.60GHz" << std::endl;
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << std::endl;
-    std::cout << "Rank " << world_rank << " printing ";
-    //array of size one where we will store the node result
-    result = new double[1];
-    //array of size world_size where we will store all the results
+    if (world_rank == root)
+    {
+        // print the name and student number and processor model only once
+        std::cout << "============================================ " << std::endl;
+        std::cout << "Name: \e[1mRoberto Alejandro Rivera Mejia\e[0m" << std::endl;
+        std::cout << "No: 3019536" << std::endl;
+        std::cout << "uP: Intel(R) Core(TM) i5-3230M CPU @ 2.60GHz" << std::endl;
+        std::cout << "============================================ " << std::endl;
+        std::cout << "Rank " << world_rank << " printing ";
+    }
+
+    
+    //variable to hold the result of the operation
+    result = 0;
+
+    //array with a size = world_size where we will store results from each node
     totalResults = new double[world_size];
-    //save the result of the operation
-    result[0] = performOperation();
+    
+    //execute the performOperation() and save the result
+    result = performOperation();
 
     //gather the results from all the nodes including itself
-    MPI_Gather(result, 1, MPI_DOUBLE, totalResults, 1, MPI_DOUBLE, root, MPI_COMM_WORLD);
+    MPI_Gather(&result, 1, MPI_DOUBLE, totalResults, 1, MPI_DOUBLE, root, MPI_COMM_WORLD);
 
-    //printing results contained in array totalResults
-    std::cout << "results: " << std::endl;
-    for (unsigned int i = 0; i < world_size; i++)
+    //print All of the results 
+    if (world_rank == root)
     {
-        double rank_time = totalResults[i];
-        printf("Runtime = %f\n", rank_time);
+        //printing results contained in array totalResults
+        std::cout << "results:\n" << std::endl;
+        for (unsigned int i = 0; i < world_size; i++)
+        {
+            double rank_time = totalResults[i];
+            printf("\tRuntime = %f\n", rank_time);
+        }
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
-    //deallocate memory
-    delete totalResults, result;
-}
+     //deallocate memory
+    delete totalResults;
 
-void participant()
-{
-    //array of size one where we will store the node result
-    result = new double[1];
-    //save the result of the operation
-    result[0] = performOperation();
-    // take part in the gather, sending its result to the root
-    MPI_Gather(result, 1, MPI_DOUBLE, NULL, 1, MPI_DOUBLE, root, MPI_COMM_WORLD);
-    //deallocate memory
-    delete result;
+
 }
 
 double performOperation()
