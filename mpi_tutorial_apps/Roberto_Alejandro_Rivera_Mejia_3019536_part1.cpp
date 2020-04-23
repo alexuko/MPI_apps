@@ -54,10 +54,13 @@ void participant()
     //print our the output sent to the next node
     std::cout << "Rank " << world_rank << " sending: " << HashInput2 << std::endl;
     //Print the final two hash values to the console.
+    // if(world_rank == 1){
     std::cout << "Result: "
               << "hash1= " << worldsWorstworldsWorstHash1(HashInput3) << " , "
               << "hash2= " << worldsWorstworldsWorstHash2(HashInput3) << std::endl;
     std::cout << "---------------------------------------" << std::endl;
+
+    //}
 }
 
 int main(int argc, char **argv)
